@@ -8,14 +8,17 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-  ) {}
+  ) { }
 
   async register(email: string, password: string) {
     const hash = await bcrypt.hash(password, 10);
 
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: { email, password: hash },
     });
+
+    delete (user as any).password;
+    return user;
   }
 
   async login(email: string, password: string) {
@@ -26,7 +29,10 @@ export class AuthService {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) throw new UnauthorizedException();
 
-    const token = this.jwt.sign({ sub: user.id });
+    const token = this.jwt.sign({
+      sub: user.id,
+      email: user.email,
+    });
     return { access_token: token };
   }
 }
