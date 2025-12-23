@@ -19,21 +19,26 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("token")
-    const userId = localStorage.getItem("userId")
 
     if (!token) {
-    //   router.push("/login")
+      router.push("/login")
       return
     }
 
-    fetchTasks(token, userId!)
+    fetchTasks(token)
   }, [router])
 
-  const fetchTasks = async (token: string, userId: string) => {
+
+  const fetchTasks = async (token: string) => {
     try {
-      const response = await fetch(`http://localhost:4002/api/tasks/user/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await fetch(
+        "http://localhost:3003/api/tasks/me",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
 
       if (response.ok) {
         const data = await response.json()
@@ -46,10 +51,10 @@ export default function DashboardPage() {
     }
   }
 
+
   const handleLogout = () => {
     localStorage.removeItem("token")
-    localStorage.removeItem("userId")
-    router.push("/")
+    router.push("/login")
   }
 
   return (
@@ -86,13 +91,12 @@ export default function DashboardPage() {
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg font-semibold">{task.title}</h3>
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        task.status === "done"
-                          ? "bg-green-100 text-green-800"
-                          : task.status === "in-progress"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-slate-100 text-slate-800"
-                      }`}
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${task.status === "done"
+                        ? "bg-green-100 text-green-800"
+                        : task.status === "in-progress"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-slate-100 text-slate-800"
+                        }`}
                     >
                       {task.status}
                     </span>
