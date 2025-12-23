@@ -28,7 +28,7 @@ export default function CreateTaskPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:4002/api/tasks", {
+      const response = await fetch("http://localhost:3003/api/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
