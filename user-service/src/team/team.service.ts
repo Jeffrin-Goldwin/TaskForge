@@ -48,4 +48,29 @@ export class TeamService {
 
         return user.team;
     }
+
+    async joinTeam(userId: string, teamId: string) {
+        // 1. Check if user exists
+        const user = await this.prisma.userProfile.findUnique({
+            where: { authUserId: userId },
+        });
+
+        if (!user) throw new BadRequestException('User profile not found');
+        if (user.teamId) throw new BadRequestException('User already belongs to a team');
+
+        // 2. Check if team exists
+        const team = await this.prisma.team.findUnique({
+            where: { id: teamId },
+        });
+
+        if (!team) throw new BadRequestException('Team not found');
+
+        // 3. Update User
+        await this.prisma.userProfile.update({
+            where: { authUserId: userId },
+            data: { teamId: team.id },
+        });
+
+        return team;
+    }
 }

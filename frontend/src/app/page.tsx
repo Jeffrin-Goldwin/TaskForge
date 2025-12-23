@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { Login } from "@/components/custom/Login";
 import { CreateTeam } from "@/components/custom/CreateTeam";
+import { JoinTeam } from "@/components/custom/JoinTeam";
 import { TaskList } from "@/components/custom/TaskList";
 import { CreateTaskBtn } from "@/components/custom/CreateTaskBtn";
-import { userApi, getAuthHeader } from "@/lib/api";
+import { userApi } from "@/lib/api";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
   const [token, setToken] = useState<string | null>(null);
@@ -74,14 +76,28 @@ export default function Home() {
         <header className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">TaskForge</h1>
           <div className="flex items-center gap-4">
-            <span>{user?.email}</span>
-            <Button variant="outline" onClick={handleLogout}>Logout</Button>
+            <span className="text-sm font-medium">{user?.email}</span>
+            {user?.team && (
+              <span className="text-xs bg-slate-200 px-2 py-1 rounded">Team: {user.team.name}</span>
+            )}
+            <Button variant="outline" size="sm" onClick={handleLogout}>Logout</Button>
           </div>
         </header>
 
         {!user?.teamId ? (
           <div className="flex justify-center items-center h-[50vh]">
-            <CreateTeam onTeamCreated={() => fetchUser(token)} />
+            <Tabs defaultValue="create" className="w-[400px]">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="create">Create Team</TabsTrigger>
+                <TabsTrigger value="join">Join Team</TabsTrigger>
+              </TabsList>
+              <TabsContent value="create" className="flex justify-center mt-4">
+                <CreateTeam onTeamCreated={() => fetchUser(token)} />
+              </TabsContent>
+              <TabsContent value="join" className="flex justify-center mt-4">
+                <JoinTeam onTeamJoined={() => fetchUser(token)} />
+              </TabsContent>
+            </Tabs>
           </div>
         ) : (
           <div className="space-y-6">

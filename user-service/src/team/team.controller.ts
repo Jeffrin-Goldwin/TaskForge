@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Headers, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
+import { JoinTeamDto } from './dto/join-team.dto';
 import { validateToken } from '../auth/auth.client';
 import { ConfigService } from '@nestjs/config';
 
@@ -27,5 +28,16 @@ export class TeamController {
         const authUrl = this.config.get('AUTH_SERVICE_URL');
         const { userId } = await validateToken(authUrl, auth);
         return this.teamService.getMyTeam(userId);
+    }
+
+    @Post('join')
+    @UsePipes(new ValidationPipe())
+    async join(
+        @Headers('authorization') auth: string,
+        @Body() dto: JoinTeamDto,
+    ) {
+        const authUrl = this.config.get('AUTH_SERVICE_URL');
+        const { userId } = await validateToken(authUrl, auth);
+        return this.teamService.joinTeam(userId, dto.teamId);
     }
 }
