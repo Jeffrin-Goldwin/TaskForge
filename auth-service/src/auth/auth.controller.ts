@@ -19,6 +19,6 @@ export class AuthController {
   @Post('validate')
   @UseGuards(JwtAuthGuard)
   validate(@Req() req) {
-    return { valid: true, userId: req.user.userId };
+    return { valid: true, userId: req.user.userId, email: req.user.email };
   }
 }
